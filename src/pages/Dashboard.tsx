@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart, PieChart } from '@/components/ui/chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Building, CheckCircle, MapPin, Users, PlusCircle, Bell, Send } from 'lucide-react';
+import { ArrowRight, Building, CheckCircle, MapPin, Users, PlusCircle, Bell } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
@@ -168,7 +167,7 @@ interface StatsCardProps {
   icon: React.ReactNode;
 }
 
-const StatsCard = ({ title, value, change, changeType = 'neutral', isPercentage, icon }: StatsCardProps) => {
+const StatsCard = ({ title, value, change, changeType, isPercentage, icon }: StatsCardProps) => {
   return (
     <Card className="card-stats">
       <div className="flex items-start justify-between">
