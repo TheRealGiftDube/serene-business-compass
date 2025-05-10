@@ -9,6 +9,9 @@ import Dashboard from "./pages/Dashboard";
 import BusinessDirectory from "./pages/BusinessDirectory";
 import BusinessProfile from "./pages/BusinessProfile";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
+import AuthCallback from "./pages/AuthCallback";
+import { AuthProvider, RequireAuth } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -18,12 +21,43 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MainLayout><Dashboard /></MainLayout>} />
-          <Route path="/businesses" element={<MainLayout><BusinessDirectory /></MainLayout>} />
-          <Route path="/profile" element={<MainLayout><BusinessProfile /></MainLayout>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+            <Route 
+              path="/" 
+              element={
+                <RequireAuth>
+                  <MainLayout>
+                    <Dashboard />
+                  </MainLayout>
+                </RequireAuth>
+              } 
+            />
+            <Route 
+              path="/businesses" 
+              element={
+                <RequireAuth>
+                  <MainLayout>
+                    <BusinessDirectory />
+                  </MainLayout>
+                </RequireAuth>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <RequireAuth>
+                  <MainLayout>
+                    <BusinessProfile />
+                  </MainLayout>
+                </RequireAuth>
+              } 
+            />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
