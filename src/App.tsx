@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import MainLayout from "./components/layout/MainLayout";
+import PublicLayout from "./components/layout/PublicLayout";
 import Dashboard from "./pages/Dashboard";
 import BusinessDirectory from "./pages/BusinessDirectory";
 import BusinessProfile from "./pages/BusinessProfile";
@@ -29,13 +30,53 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Public routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/businesses" element={<BusinessDirectory />} />
-            <Route path="/businesses/:id" element={<BusinessProfile />} />
-            <Route path="/events" element={<Events />} />
+            {/* Public routes with consistent header/footer */}
+            <Route 
+              path="/" 
+              element={
+                <PublicLayout>
+                  <HomePage />
+                </PublicLayout>
+              } 
+            />
+            <Route 
+              path="/auth" 
+              element={
+                <PublicLayout>
+                  <Auth />
+                </PublicLayout>
+              } 
+            />
+            <Route 
+              path="/auth/callback" 
+              element={
+                <PublicLayout>
+                  <AuthCallback />
+                </PublicLayout>
+              } 
+            />
+            <Route 
+              path="/businesses" 
+              element={
+                <BusinessDirectory />
+              } 
+            />
+            <Route 
+              path="/businesses/:id" 
+              element={
+                <PublicLayout>
+                  <BusinessProfile />
+                </PublicLayout>
+              } 
+            />
+            <Route 
+              path="/events" 
+              element={
+                <PublicLayout>
+                  <Events />
+                </PublicLayout>
+              } 
+            />
             
             {/* Business Owner routes */}
             <Route
@@ -92,7 +133,14 @@ const App = () => (
             />
             
             {/* Catch all */}
-            <Route path="*" element={<NotFound />} />
+            <Route 
+              path="*" 
+              element={
+                <PublicLayout>
+                  <NotFound />
+                </PublicLayout>
+              } 
+            />
           </Routes>
         </AuthProvider>
       </BrowserRouter>
