@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
@@ -38,7 +36,23 @@ const AdminSettings = () => {
         if (error) throw error;
         
         if (data && data.content) {
-          setHomeContent(data.content as HomeContent);
+          // Type guard to ensure content has the expected shape
+          const contentData = data.content as Record<string, any>;
+          
+          // Verify and extract the required fields
+          if (
+            typeof contentData.headline === 'string' &&
+            typeof contentData.category === 'string' &&
+            typeof contentData.cta1 === 'string' &&
+            typeof contentData.cta2 === 'string'
+          ) {
+            setHomeContent({
+              headline: contentData.headline,
+              category: contentData.category,
+              cta1: contentData.cta1,
+              cta2: contentData.cta2
+            });
+          }
         }
       } catch (error) {
         console.error('Error fetching home page content:', error);
@@ -58,7 +72,14 @@ const AdminSettings = () => {
     try {
       const { error } = await supabase
         .from('site_content')
-        .update({ content: homeContent })
+        .update({ 
+          content: {
+            headline: homeContent.headline,
+            category: homeContent.category,
+            cta1: homeContent.cta1,
+            cta2: homeContent.cta2
+          }
+        })
         .eq('page_name', 'home');
       
       if (error) throw error;

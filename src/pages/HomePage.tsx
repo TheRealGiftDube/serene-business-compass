@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -34,7 +33,23 @@ const HomePage = () => {
         if (error) throw error;
         
         if (data && data.content) {
-          setContent(data.content as HomeContent);
+          // Type guard to ensure content has the expected shape
+          const contentData = data.content as Record<string, any>;
+          
+          // Verify and extract the required fields
+          if (
+            typeof contentData.headline === 'string' &&
+            typeof contentData.category === 'string' &&
+            typeof contentData.cta1 === 'string' &&
+            typeof contentData.cta2 === 'string'
+          ) {
+            setContent({
+              headline: contentData.headline,
+              category: contentData.category,
+              cta1: contentData.cta1,
+              cta2: contentData.cta2
+            });
+          }
         }
       } catch (error) {
         console.error('Error fetching home page content:', error);
