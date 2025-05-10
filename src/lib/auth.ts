@@ -105,3 +105,43 @@ export const signOut = async () => {
     toast.error(error.message || "Failed to sign out");
   }
 };
+
+// Check if user is admin and bypass plan restrictions
+export const isUserAdmin = async () => {
+  try {
+    const { data, error } = await supabase.rpc('get_user_role');
+    
+    if (error) throw error;
+    
+    return data === 'admin';
+  } catch (error) {
+    console.error("Error checking if user is admin:", error);
+    return false;
+  }
+};
+
+// Check if user has access to a specific feature based on their plan
+// Admin users bypass plan restrictions
+export const checkUserAccess = async (permission: string) => {
+  try {
+    // First check if user is admin - admins have access to everything
+    const isAdmin = await isUserAdmin();
+    
+    if (isAdmin) {
+      return true; // Admin users bypass all restrictions
+    }
+    
+    // For non-admin users, check their plan permissions
+    const { data, error } = await supabase.rpc('check_user_plan_access', {
+      _user_id: supabase.auth.getUser().then(res => res.data.user?.id),
+      _permission: permission
+    });
+    
+    if (error) throw error;
+    
+    return data;
+  } catch (error) {
+    console.error("Error checking user access:", error);
+    return false;
+  }
+};

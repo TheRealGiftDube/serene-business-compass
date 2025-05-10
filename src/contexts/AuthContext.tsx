@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 
 interface UserRole {
@@ -15,6 +15,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   userRole: UserRole['role'];
+  isAdmin: boolean;
   checkUserRole: () => Promise<UserRole['role']>;
 }
 
@@ -24,6 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   isAuthenticated: false,
   userRole: 'public',
+  isAdmin: false,
   checkUserRole: async () => 'public',
 });
 
@@ -34,7 +36,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userRole, setUserRole] = useState<UserRole['role']>('public');
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Scroll to top on route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   const checkUserRole = async (): Promise<UserRole['role']> => {
     if (!user) return 'public';
@@ -46,6 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       const role = data as UserRole['role'];
       setUserRole(role);
+      setIsAdmin(role === 'admin');
       return role;
     } catch (error) {
       console.error("Error checking user role:", error);
@@ -64,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await checkUserRole();
         } else {
           setUserRole('public');
+          setIsAdmin(false);
         }
         
         setIsLoading(false);
@@ -108,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isLoading,
     isAuthenticated: !!user,
     userRole,
+    isAdmin,
     checkUserRole,
   };
 

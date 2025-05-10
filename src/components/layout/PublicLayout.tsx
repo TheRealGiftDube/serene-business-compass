@@ -11,6 +11,11 @@ interface PublicLayoutProps {
 const PublicLayout = ({ children }: PublicLayoutProps) => {
   const navigate = useNavigate();
   const { isAuthenticated, userRole } = useAuth();
+  
+  const handleNavigation = (path: string) => {
+    window.scrollTo(0, 0);
+    navigate(path);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -19,29 +24,32 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>BizConnect</h1>
+              <h1 className="text-xl font-bold cursor-pointer" onClick={() => handleNavigation('/')}>BizConnect</h1>
             </div>
             <nav className="flex space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/businesses')}>
+              <Button variant="ghost" onClick={() => handleNavigation('/businesses')}>
                 Businesses
               </Button>
-              <Button variant="ghost" onClick={() => navigate('/events')}>
+              <Button variant="ghost" onClick={() => handleNavigation('/events')}>
                 Events
+              </Button>
+              <Button variant="ghost" onClick={() => handleNavigation('/pricing')}>
+                Pricing
               </Button>
               {isAuthenticated ? (
                 <>
                   {userRole === 'admin' ? (
-                    <Button variant="ghost" onClick={() => navigate('/admin')}>
+                    <Button variant="ghost" onClick={() => handleNavigation('/admin')}>
                       Admin
                     </Button>
                   ) : (
-                    <Button variant="ghost" onClick={() => navigate('/dashboard')}>
+                    <Button variant="ghost" onClick={() => handleNavigation('/dashboard')}>
                       Dashboard
                     </Button>
                   )}
                 </>
               ) : (
-                <Button variant="outline" onClick={() => navigate('/auth')}>
+                <Button variant="outline" onClick={() => handleNavigation('/auth')}>
                   Sign In
                 </Button>
               )}
@@ -69,17 +77,22 @@ const PublicLayout = ({ children }: PublicLayoutProps) => {
               <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2">
                 <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/businesses')}>
+                  <Button variant="link" className="text-gray-300 p-0" onClick={() => handleNavigation('/businesses')}>
                     Browse Businesses
                   </Button>
                 </li>
                 <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/events')}>
+                  <Button variant="link" className="text-gray-300 p-0" onClick={() => handleNavigation('/events')}>
                     Upcoming Events
                   </Button>
                 </li>
                 <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/auth')}>
+                  <Button variant="link" className="text-gray-300 p-0" onClick={() => handleNavigation('/pricing')}>
+                    Pricing Plans
+                  </Button>
+                </li>
+                <li>
+                  <Button variant="link" className="text-gray-300 p-0" onClick={() => handleNavigation('/auth')}>
                     Register Your Business
                   </Button>
                 </li>

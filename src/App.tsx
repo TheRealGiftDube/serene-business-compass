@@ -19,6 +19,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminBusinesses from "./pages/admin/AdminBusinesses";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Events from "./pages/Events";
+import PricingPlans from "./pages/PricingPlans";
 
 const queryClient = new QueryClient();
 
@@ -58,7 +59,9 @@ const App = () => (
             <Route 
               path="/businesses" 
               element={
-                <BusinessDirectory />
+                <PublicLayout>
+                  <BusinessDirectory />
+                </PublicLayout>
               } 
             />
             <Route 
@@ -77,12 +80,20 @@ const App = () => (
                 </PublicLayout>
               } 
             />
+            <Route 
+              path="/pricing" 
+              element={
+                <PublicLayout>
+                  <PricingPlans />
+                </PublicLayout>
+              } 
+            />
             
             {/* Business Owner routes */}
             <Route
               path="/dashboard"
               element={
-                <RequireAuth requiredRole="business_owner">
+                <RequireAuth>
                   <MainLayout>
                     <Dashboard />
                   </MainLayout>

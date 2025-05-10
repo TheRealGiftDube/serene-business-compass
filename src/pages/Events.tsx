@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, MapPin, Clock } from "lucide-react";
 import { format } from "date-fns";
-import { useAuth } from "@/contexts/AuthContext";
 
 interface Event {
   id: string;
@@ -21,7 +20,6 @@ interface Event {
 
 const Events = () => {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -65,161 +63,86 @@ const Events = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header with navigation */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex-shrink-0 flex items-center">
-              <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>
-                BizConnect
-              </h1>
-            </div>
-            <nav className="flex space-x-4">
-              <Button variant="ghost" onClick={() => navigate('/businesses')}>
-                Businesses
-              </Button>
-              <Button variant="ghost" onClick={() => navigate('/events')}>
-                Events
-              </Button>
-              {isAuthenticated ? (
-                <Button variant="ghost" onClick={() => navigate('/dashboard')}>
-                  Dashboard
-                </Button>
-              ) : (
-                <Button variant="outline" onClick={() => navigate('/auth')}>
-                  Sign In
-                </Button>
+    <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-12">
+        <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+          Upcoming Events
+        </h1>
+        <p className="mt-4 text-lg text-gray-500">
+          Discover industry events, workshops, and promotions
+        </p>
+      </div>
+      
+      {isLoading ? (
+        <div className="flex justify-center py-12">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-primary"></div>
+        </div>
+      ) : events.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+          <h3 className="text-lg font-medium text-gray-900">No events found</h3>
+          <p className="mt-2 text-gray-500">Check back later for upcoming events.</p>
+        </div>
+      ) : (
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {events.map((event) => (
+            <Card key={event.id} className={event.is_featured ? "border-primary" : ""}>
+              {event.is_featured && (
+                <div className="bg-primary text-primary-foreground px-4 py-1 text-sm font-medium text-center">
+                  Featured Event
+                </div>
               )}
-            </nav>
-          </div>
-        </div>
-      </header>
-      
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Upcoming Events
-          </h1>
-          <p className="mt-4 text-lg text-gray-500">
-            Discover industry events, workshops, and promotions
-          </p>
-        </div>
-        
-        {isLoading ? (
-          <div className="flex justify-center py-12">
-            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-primary"></div>
-          </div>
-        ) : events.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-lg shadow-sm">
-            <h3 className="text-lg font-medium text-gray-900">No events found</h3>
-            <p className="mt-2 text-gray-500">Check back later for upcoming events.</p>
-          </div>
-        ) : (
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => (
-              <Card key={event.id} className={event.is_featured ? "border-primary" : ""}>
-                {event.is_featured && (
-                  <div className="bg-primary text-primary-foreground px-4 py-1 text-sm font-medium text-center">
-                    Featured Event
-                  </div>
-                )}
-                {event.image_url ? (
-                  <div 
-                    className="h-48 w-full bg-gray-200 bg-cover bg-center" 
-                    style={{ backgroundImage: `url(${event.image_url})` }}
-                  ></div>
-                ) : (
-                  <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
-                    <Calendar className="h-12 w-12 text-gray-400" />
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle>{event.title}</CardTitle>
-                  <CardDescription className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{formatEventDate(event.event_date)}</span>
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="mb-4 flex items-center text-sm text-muted-foreground">
-                    <Clock className="mr-1 h-4 w-4" />
-                    <span>{formatEventTime(event.event_date)}</span>
-                    
-                    {event.location && (
-                      <>
-                        <span className="mx-2">•</span>
-                        <MapPin className="mr-1 h-4 w-4" />
-                        <span>{event.location}</span>
-                      </>
-                    )}
-                  </div>
-                  <p className="line-clamp-3 text-sm">
-                    {event.description || 'No description available for this event.'}
-                  </p>
-                </CardContent>
-                <CardFooter>
-                  {event.rsvp_link ? (
-                    <Button 
-                      className="w-full" 
-                      onClick={() => window.open(event.rsvp_link, '_blank')}
-                    >
-                      RSVP Now
-                    </Button>
-                  ) : (
-                    <Button className="w-full" variant="outline">
-                      View Details
-                    </Button>
+              {event.image_url ? (
+                <div 
+                  className="h-48 w-full bg-gray-200 bg-cover bg-center" 
+                  style={{ backgroundImage: `url(${event.image_url})` }}
+                ></div>
+              ) : (
+                <div className="h-48 w-full bg-gray-200 flex items-center justify-center">
+                  <Calendar className="h-12 w-12 text-gray-400" />
+                </div>
+              )}
+              <CardHeader>
+                <CardTitle>{event.title}</CardTitle>
+                <CardDescription className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{formatEventDate(event.event_date)}</span>
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="mb-4 flex items-center text-sm text-muted-foreground">
+                  <Clock className="mr-1 h-4 w-4" />
+                  <span>{formatEventTime(event.event_date)}</span>
+                  
+                  {event.location && (
+                    <>
+                      <span className="mx-2">•</span>
+                      <MapPin className="mr-1 h-4 w-4" />
+                      <span>{event.location}</span>
+                    </>
                   )}
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        )}
-      </main>
-      
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white mt-16">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">BizConnect</h3>
-              <p className="text-gray-300">
-                Zimbabwe's premier business directory platform.
-              </p>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/businesses')}>
-                    Browse Businesses
+                </div>
+                <p className="line-clamp-3 text-sm">
+                  {event.description || 'No description available for this event.'}
+                </p>
+              </CardContent>
+              <CardFooter>
+                {event.rsvp_link ? (
+                  <Button 
+                    className="w-full" 
+                    onClick={() => window.open(event.rsvp_link, '_blank')}
+                  >
+                    RSVP Now
                   </Button>
-                </li>
-                <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/events')}>
-                    Upcoming Events
+                ) : (
+                  <Button className="w-full" variant="outline">
+                    View Details
                   </Button>
-                </li>
-                <li>
-                  <Button variant="link" className="text-gray-300 p-0" onClick={() => navigate('/auth')}>
-                    Register Your Business
-                  </Button>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact</h3>
-              <p className="text-gray-300">info@bizconnect.co.zw</p>
-              <p className="text-gray-300">+263 123 456 789</p>
-            </div>
-          </div>
-          <div className="mt-8 pt-8 border-t border-gray-700 text-sm text-gray-400">
-            <p>&copy; {new Date().getFullYear()} BizConnect. All rights reserved.</p>
-          </div>
+                )}
+              </CardFooter>
+            </Card>
+          ))}
         </div>
-      </footer>
+      )}
     </div>
   );
 };
