@@ -132,8 +132,15 @@ export const checkUserAccess = async (permission: string) => {
     }
     
     // For non-admin users, check their plan permissions
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+    
+    if (!userId) {
+      return false; // No user ID available
+    }
+    
     const { data, error } = await supabase.rpc('check_user_plan_access', {
-      _user_id: supabase.auth.getUser().then(res => res.data.user?.id),
+      _user_id: userId,
       _permission: permission
     });
     
