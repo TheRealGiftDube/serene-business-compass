@@ -121,14 +121,16 @@ export const isUserAdmin = async () => {
 };
 
 // Check if user has access to a specific feature based on their plan
-// Admin users bypass plan restrictions
+// Admin users bypass plan restrictions and are assigned the Premium plan permissions
 export const checkUserAccess = async (permission: string) => {
   try {
     // First check if user is admin - admins have access to everything
     const isAdmin = await isUserAdmin();
     
     if (isAdmin) {
-      return true; // Admin users bypass all restrictions
+      // For admin users, automatically grant all permissions
+      // as if they have the Premium plan, no need to check permissions
+      return true;
     }
     
     // For non-admin users, check their plan permissions

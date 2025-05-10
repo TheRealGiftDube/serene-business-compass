@@ -165,7 +165,7 @@ const PricingPlans = () => {
       {isAdmin && (
         <div className="mt-10 bg-primary/10 p-5 rounded-lg border border-primary/20">
           <h3 className="font-semibold text-lg mb-2">Admin Notice</h3>
-          <p>As an admin, you have full access to all features regardless of any plan restrictions.</p>
+          <p>As an admin, you automatically have all features of the Premium plan and bypass all plan restrictions.</p>
         </div>
       )}
     </div>
